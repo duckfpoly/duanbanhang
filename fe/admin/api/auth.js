@@ -8,8 +8,7 @@ export const adminAuth = () => {
   };
 
   const adminLogout = async () => {
-    // return await $api.delete('admin/logout');
-    return await $api.get('admin/categories');
+    return await $api.delete('admin/logout');
   };
 
   return {

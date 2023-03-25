@@ -9,12 +9,19 @@
   </li>
 </template>
 <script>
+import { ref, reactive ,useRouter } from '@nuxtjs/composition-api'
+
 export default {
-   name: "sidebar-items",
-    props: {
-      url:  String,
-      sidebarText: String,
-    }
+  name: "sidebar-items",
+  props: {
+    url:  String,
+    sidebarText: String,
+  },
+  setup(){
+    const route = useRouter()
+    // console.log(route.currentRoute.name);
+  }
+
 }
 </script>
 <style scoped>

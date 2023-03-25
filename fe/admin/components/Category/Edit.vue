@@ -20,7 +20,7 @@ import { categoryApi } from '@/api/categories'
 import { ShowNotification } from '../../global/notification.js';
 
 export default defineComponent({
-  name: 'category-edit',
+  name: 'category-edit-id',
     data(){
       return {
         search : '',
@@ -33,20 +33,24 @@ export default defineComponent({
       const direct = (path,message) => {
         route.push({
           path: path,
-          query: { 
-            message: message 
+          query: {
+            message: message
           }
         })
-      } 
-      const id = computed(() => Number(route.currentRoute.params.id)).value
-      const loadDetailCategories = async (id) => {
-        const res = await showCategory(id)
+      }
+      const categoryId = route.currentRoute.params.id;
+      const loadDetailCategories = async () => {
+        const res = await showCategory(categoryId)
         name_category.value = res.data.name_category
         return name_category
       }
-      loadDetailCategories(id)
+      loadDetailCategories()
       const handleEdit = async () => {
-        const res = await updateCategory(id,name_category.value)
+        var obj = {
+          name_category: name_category.value,
+          status: 0
+        }
+        const res = await updateCategory(categoryId,obj)
         if(res.status === false){
           var result = res.data
           for (const [key, value] of Object.entries(result)) {
@@ -58,7 +62,7 @@ export default defineComponent({
       }
       return {
         name_category,
-        handleEdit
+        handleEdit,
       }
     },
   })

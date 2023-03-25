@@ -23,13 +23,13 @@
       const direct = (path,message) => {
         router.push({
           path: path,
-          query: { 
-            message: message 
+          query: {
+            message: message
           }
         })
-      } 
+      }
       const handleCreate = async () =>{
-        const res = await createCategory(name_category.value)
+        const res = await createCategory({name_category: name_category.value})
         if(res.status === false){
           var result = res.data
           for (const [key, value] of Object.entries(result)) {

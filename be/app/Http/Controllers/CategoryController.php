@@ -23,7 +23,7 @@ class CategoryController extends Controller
     }
     public function index(): AnonymousResourceCollection
     {
-        return CategoryResource::collection($this->model->all());
+        return CategoryResource::collection($this->model->paginate(1));
     }
     public function store(Request $request): JsonResponse
     {

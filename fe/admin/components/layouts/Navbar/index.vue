@@ -3,6 +3,8 @@
     class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl"
     id="navbarBlur"
     data-scroll="false"
+    v-loading.fullscreen.lock="fullscreenLoading"
+    :element-loading-text="textLoading"
   >
   <div class="container-fluid py-1 px-3">
     <nav aria-label="breadcrumb">
@@ -18,54 +20,13 @@
     >
       <div class="ms-md-auto pe-md-3 d-flex align-items-center"></div>
       <ul class="navbar-nav justify-content-end">
-        <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
-          <a
-            href="#"
-            class="nav-link text-white p-0"
-            id="iconNavbarSidenav"
-          >
-            <div class="sidenav-toggler-inner">
-              <i class="sidenav-toggler-line bg-white"></i>
-              <i class="sidenav-toggler-line bg-white"></i>
-              <i class="sidenav-toggler-line bg-white"></i>
-            </div>
-          </a>
-        </li>
-        <li class="nav-item px-3 d-flex align-items-center">
-          <a href="#" class="nav-link text-white p-0">
-            <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
-          </a>
-        </li>
-        <li
-          class="nav-item dropdown pe-2 d-flex align-items-center"
-          id="notifications"
-        >
-          <button
-            class="p-0 position-relative text-white"
-            id="dropdownMenuButton"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-            style="background: none; border: none"
-          >
-            <span
-              id="count_noti"
-              class="d-none position-absolute top-0 start-0 translate-middle-x text-light bg-danger text-center fw-bold"
-              style="
-                width: 15px;
-                height: 15px;
-                font-size: 8px;
-                border-radius: 50%;
-              "
-            ></span>
-            <i class="fa fa-bell cursor-pointer"></i>
-          </button>
-        </li>
-        &emsp;
         <li class="nav-item d-flex align-items-center">
-          <button class=" nav-link text-white font-weight-bold px-0" style="background: none; border: none;">
-            <i class="fa fa-user me-sm-1"></i>
-            <span class="d-sm-inline d-none" @click="processLogout">Đăng xuất</span>
-          </button>
+          <form @submit.prevent="processLogout">
+            <button class=" nav-link text-white font-weight-bold px-0" style="background: none; border: none;">
+              <i class="fa fa-user me-sm-1"></i>
+              <span class="d-sm-inline d-none" @click="submitLogout" type="submit">Đăng xuất</span>
+            </button>
+          </form>
         </li>
       </ul>
     </div>
@@ -73,23 +34,40 @@
   </nav>
 </template>
 <script>
-  import { defineComponent, useRouter } from '@nuxtjs/composition-api'
+  import { useRouter,useContext } from '@nuxtjs/composition-api'
   import { adminAuth } from '@/api/auth'
-  export default defineComponent({
+  import { ShowNotification } from '../../../global/notification.js';
+
+  export default {
+    data() {
+      return {
+        fullscreenLoading: false,
+        textLoading: 'Đang xử lý ...'
+      }
+    },
     setup(){
       const router = useRouter()
       const { adminLogout } = adminAuth()
+      const { $cookies } = useContext()
       const processLogout = async () => {
         const response = await adminLogout()
-        console.log(response);
-        // if(response){
-        //   sessionStorage.clear()
-        //   router.push({path: '/login'})
-        // }
+        if(response.status == true){
+          $cookies.remove('token')
+          ShowNotification('Success', 'Đăng xuất thành công !', 'success')
+          router.push({path: 'auth/login'})
+        }else {
+          ShowNotification('Error', 'Lỗi đăng xuất !', 'error')
+          router.push({path: '/'})
+        }
       }
       return {
         processLogout
       }
+    },
+    methods: {
+      submitLogout() {
+        this.fullscreenLoading = true;
+      },
     }
-})
+  }
 </script>
