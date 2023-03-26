@@ -1,9 +1,6 @@
 <template>
-  <div>
-    <el-table
-      :data="categories.filter((data) => !search || data.name_category.toLowerCase().includes(search.toLowerCase()))"
-      style="width: 100%"
-    >
+  <div v-loading="loading">
+    <el-table :data="categories" style="width: 100%">
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column label="Tên danh mục" prop="name_category"></el-table-column>
       <el-table-column label="Trạng thái" prop="status">
@@ -14,9 +11,6 @@
         </template>
       </el-table-column>
       <el-table-column align="right">
-        <!-- <template slot="header" slot-scope="scope">
-          <el-input v-model="search" size="mini" placeholder="Tìm danh mục ..."/>
-        </template> -->
         <template slot-scope="scope">
           <el-button><NuxtLink class="link" :to="`/categories/edit/${scope.row.id}`">Sửa</NuxtLink></el-button>
           <el-button type="danger" slot="reference" @click="handleDelete(scope.row.id)">Xoá</el-button>
@@ -24,7 +18,7 @@
       </el-table-column>
     </el-table>
     <div class="mt-5"></div>
-    <Pagination :pagination="pagination" :currentPage="currentPage" :changePage="changePage" />
+    <PaginationVer2 v-if="categories != ''" :totalItems="totalPage" url="categories" :fnProcess="loadCategories" :search="searchParam"/>
   </div>
 </template>
 
@@ -37,33 +31,28 @@
       const route = useRouter()
       const { allCategory, deleteCategory } = categoryApi()
 
-      const search = ref('')
-      const categories = ref([])
-      const messageParam = ref(route.currentRoute.query.message)
+      const search        = ref('')
+      const pagination    = ref('')
+      const categories    = ref([])
+      const totalPage     = ref(null)
+      const loading       = ref(true)
+      const query         = ref(route.currentRoute.query)
+      const messageParam  = ref(query.value.message)
+      const pageParam     = ref(query.value.page)
+      const searchParam   = ref(query.value.search)
+      const state         = reactive({ message: messageParam })
 
-      const pagination = ref('')
-      const pageParam = ref(route.currentRoute.query.page)
-      const currentPage = ref(null)
+      searchParam.value == null && route.push('/categories')
 
-      const state = reactive({ message: messageParam })
-
-      const loadCategories = async (page) => {
-        const res = await allCategory(page)
-        categories.value = res.data
-        pagination.value = res.meta
-        currentPage.value = Number(res.meta.current_page)
-        return categories, pagination, currentPage
+      const loadCategories = async (search,page) => {
+        const res = await allCategory(search,page)
+        categories.value  = res.data
+        pagination.value  = res.meta
+        totalPage.value   = Number(res.meta.total)
+        loading.value     = false
+        return categories, pagination, totalPage,loading
       }
-
-      pageParam.value !== undefined ? loadCategories('?page='+Number(pageParam.value)) : loadCategories()
-
-
-
-
-      const changePage = async (page) => {
-        await loadCategories('?page='+page)
-        route.push('/categories?page='+page)
-      }
+      loadCategories(searchParam.value,pageParam.value)
 
       const handleDelete = async (id) =>{
         let text = "Bạn muốn xoá danh mục này ?"
@@ -84,8 +73,10 @@
         handleDelete,
         search,
         pagination,
-        currentPage,
-        changePage,
+        totalPage,
+        loadCategories,
+        searchParam,
+        loading
       }
     },
   })

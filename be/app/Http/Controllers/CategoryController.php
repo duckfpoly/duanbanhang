@@ -21,9 +21,22 @@ class CategoryController extends Controller
         $this->model = new Category();
         $this->message = 'No category !';
     }
-    public function index(): AnonymousResourceCollection
+    // public function index(): AnonymousResourceCollection
+    // {
+    //     return CategoryResource::collection($this->model->paginate(1));
+    // }
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return CategoryResource::collection($this->model->paginate(1));
+        $query = $this->model->newQuery();
+        // dd($request->input('search'));
+        // Thực hiện tìm kiếm nếu có từ khóa tìm kiếm
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+            $query->where('name_category', 'LIKE', '%' . $searchTerm . '%');
+        }
+
+        // Sử dụng phương thức paginate để trả về kết quả phân trang
+        return CategoryResource::collection($query->paginate(1));
     }
     public function store(Request $request): JsonResponse
     {

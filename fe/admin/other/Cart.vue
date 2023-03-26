@@ -70,3 +70,17 @@ export default {
   }
 }
 </script>
+
+
+<!-- <script>
+import { useCart } from '~/composables/cart'
+
+export default {
+  name: 'Cart',
+  setup() {
+    const { state: cartState, addItem, removeItem, totalItems, totalPrice, clearCart } = useCart()
+
+    return { cartState, addItem, removeItem, totalItems, totalPrice, clearCart }
+  }
+}
+</script> -->

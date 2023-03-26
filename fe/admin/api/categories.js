@@ -7,8 +7,26 @@ export const categoryApi = () => {
   const url = 'admin/categories'
   const url_id = url + '/'
 
-  const allCategory = async (page) => {
-    return page !== undefined ? await $api.get(url + page) : await $api.get(url)
+  const allCategory = async (search,page) => {
+    // có search || không có phân trang
+    if(search != undefined && page == undefined) {
+      return await $api.get(`${url}?search=${search}`)
+    }
+    // có search || có phân trang
+    else if(search != undefined && page != undefined){
+      return await $api.get(`${url}?search=${search}&page=${page}`)
+    }
+    // không có search || có phân trang
+    else if(search == undefined && page != undefined){
+      return await $api.get(`${url}?page=${page}`)
+    }
+    // không có search || không có phân trang
+    else if(search == undefined && page == undefined){
+      return await $api.get(url)
+    }
+    else {
+      return await $api.get(url)
+    }
   }
 
   const createCategory = async (data) => {

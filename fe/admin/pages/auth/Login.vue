@@ -31,7 +31,8 @@
   import { ref ,useRouter, useContext  } from '@nuxtjs/composition-api'
   import { adminAuth } from '@/api/auth'
   import { ShowNotification } from '../../global/notification.js';
-  export default{
+  export default {
+    middleware: 'alreadyLogin',
     layout: 'empty',
     data() {
       return {
@@ -42,8 +43,9 @@
     setup(){
 
       const router = useRouter()
-      const { adminLogin } = adminAuth()
       const { $cookies } = useContext()
+
+      const { adminLogin } = adminAuth()
 
       const email = ref('admin@gmail.com')
       const password = ref('123')
